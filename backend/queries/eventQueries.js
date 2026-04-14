@@ -1,4 +1,4 @@
-import pool from "../../config/postgres.js";
+import pool from "../config/postgres.js";
 
 // Create Event
 export const createEvent = async (data) => {
