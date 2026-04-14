@@ -1,0 +1,18 @@
+import pool from "../config/postgres.js";
+
+const connectDB = async () => {
+  try {
+    const client = await pool.connect();
+    console.log('PostgreSQL connected');
+
+    const res = await client.query('SELECT NOW()');
+    console.log('DB Time:', res.rows[0].now);
+
+    client.release();
+  } catch (err) {
+    console.error('❌ DB connection error:', err.message);
+    process.exit(1);
+  }
+};
+
+export default connectDB;
