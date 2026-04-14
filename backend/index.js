@@ -3,6 +3,9 @@ import dotenv from "dotenv";
 import connectDB from "./utils/ConnectDB.js";
 import eventRoutes from "./routes/eventRoutes.js"
 import availabilityRoutes from "./routes/availabilityRoutes.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
+import rescheduleRoutes from "./routes/rescheduleRoutes.js";
+import overrideRoutes from "./routes/overrideRoutes.js";
 
 dotenv.config();
 
@@ -11,6 +14,9 @@ app.use(express.json());
 
 app.use("/api/events",eventRoutes);
 app.use("/api/availability", availabilityRoutes);
+app.use("/api/bookings", bookingRoutes);
+app.use("/api/reschedule", rescheduleRoutes);
+app.use("/api/overrides", overrideRoutes);
 
 connectDB();
 

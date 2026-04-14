@@ -1,4 +1,5 @@
 import pool from "../config/postgres.js";
+import { getOverrideByDate } from "../queries/overrideQueries.js";
 
 // Helper: convert time string → minutes
 const timeToMinutes = (time) => {
@@ -13,7 +14,7 @@ const minutesToTime = (mins) => {
   return `${h}:${m}`;
 };
 
-// 🔥 MAIN FUNCTION
+// MAIN FUNCTION
 export const generateAvailableSlots = async (slug, date) => {
   // 1. Get event type
   const eventRes = await pool.query(
@@ -36,14 +37,37 @@ export const generateAvailableSlots = async (slug, date) => {
     [schedule_id, dayOfWeek]
   );
 
-  const availability = availRes.rows;
+  let availability = availRes.rows;
 
-  if (availability.length === 0) return [];
+  //  4. APPLY DATE OVERRIDE HERE
+  const override = await getOverrideByDate(1, date);
 
-  // 4. Get already booked slots
+  if (override) {
+    //  Block entire day
+    if (!override.is_available) {
+      return [];
+    }
+
+    // Override time range
+    if (override.start_time && override.end_time) {
+      availability = [
+        {
+          start_time: override.start_time,
+          end_time: override.end_time,
+        },
+      ];
+    }
+  }
+
+  // If no availability → no slots
+  if (!availability || availability.length === 0) return [];
+
+  // 5. Get already booked slots
   const bookingRes = await pool.query(
     `SELECT start_time FROM bookings
-     WHERE event_type_id = $1 AND booking_date = $2 AND status = 'BOOKED'`,
+     WHERE event_type_id = $1 
+     AND booking_date = $2 
+     AND status = 'BOOKED'`,
     [eventTypeId, date]
   );
 
@@ -53,7 +77,7 @@ export const generateAvailableSlots = async (slug, date) => {
 
   let allSlots = [];
 
-  // 5. Generate slots
+  // 6. Generate slots
   for (const slot of availability) {
     let start = timeToMinutes(slot.start_time.toString().slice(0, 5));
     let end = timeToMinutes(slot.end_time.toString().slice(0, 5));
@@ -64,7 +88,7 @@ export const generateAvailableSlots = async (slug, date) => {
     }
   }
 
-  // 6. Remove booked slots
+  // 7. Remove booked slots
   const availableSlots = allSlots.filter(
     (slot) => !bookedSlots.includes(slot)
   );
