@@ -11,7 +11,15 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+const allowedOrigins = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.split(",").map((origin) => origin.trim())
+  : [];
+
+app.use(
+  cors({
+    origin: allowedOrigins.length > 0 ? allowedOrigins : "*",
+  })
+);
 
 app.use("/api/events", eventRoutes);
 app.use("/api/availability", availabilityRoutes);
@@ -21,5 +29,5 @@ app.use("/api/overrides", overrideRoutes);
 connectDB();
 
 app.listen(process.env.PORT, () => {
-  console.log(`Server running on port http://localhost:${process.env.PORT}`);
+  console.log(`Server running on port ${process.env.PORT}`);
 });

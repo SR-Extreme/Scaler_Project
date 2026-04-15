@@ -28,7 +28,7 @@ Create `backend/.env`:
 ```bash
 PORT=5000
 DB_USER=postgres
-DB_HOST=localhost
+DB_HOST=your-render-postgres-host
 DB_NAME=DB_Name
 DB_PASSWORD=your_password
 DB_PORT=5432
@@ -42,13 +42,13 @@ npm install
 npm start
 ```
 
-Backend runs at `http://localhost:5000` (or your `PORT`).
+Backend runs at your configured domain and `PORT`.
 
 #### 2) Frontend Setup
 Optionally create `frontend/.env`:
 
 ```bash
-VITE_API_BASE_URL=http://localhost:5000/api
+VITE_API_BASE_URL=https://your-backend-service.onrender.com/api
 ```
 
 Install and start:
