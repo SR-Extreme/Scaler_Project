@@ -4,7 +4,17 @@ import { sendMailerConfirm, sendMailerCancel } from "../utils/sendMailer.js";
 
 const sendEmailSafely = (emailPromise, label) => {
   Promise.resolve(emailPromise).catch((error) => {
-    console.error(`${label} Email Error:`, error.message);
+    const errorDetails =
+      error?.message ||
+      error?.text ||
+      (error?.status ? `EmailJS status ${error.status}` : null) ||
+      String(error);
+
+    console.error(`${label} Email Error:`, errorDetails);
+
+    if (error?.status) {
+      console.error(`${label} Email Status:`, error.status);
+    }
   });
 };
 
