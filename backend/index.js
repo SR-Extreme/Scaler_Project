@@ -6,11 +6,13 @@ import availabilityRoutes from "./routes/availabilityRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import rescheduleRoutes from "./routes/rescheduleRoutes.js";
 import overrideRoutes from "./routes/overrideRoutes.js";
+import cors from "cors";
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.use("/api/events",eventRoutes);
 app.use("/api/availability", availabilityRoutes);

@@ -1,11 +1,12 @@
-import React from 'react'
+import { BrowserRouter } from "react-router-dom";
+import AppRoutes from "./routes/AppRoutes.jsx";
 
-const App = () => {
+function App() {
   return (
-    <div>
-      Scaler Project
-    </div>
-  )
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;

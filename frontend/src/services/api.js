@@ -1,0 +1,88 @@
+import axios from "axios";
+
+// Create Axios instance
+const API = axios.create({
+  baseURL: "http://localhost:5000/api",
+  withCredentials: false, // no auth required
+});
+
+// EVENT APIs
+
+// Get all events
+export const getEvents = async () => {
+  return API.get("/events");
+};
+
+// Create event
+export const createEvent = async (data) => {
+  return API.post("/events", data);
+};
+
+// Delete event
+export const deleteEvent = async (id) => {
+  return API.delete(`/events/${id}`);
+};
+
+// AVAILABILITY APIs
+
+// Create schedule
+export const createSchedule = async (data) => {
+  return API.post("/availability/schedule", data);
+};
+
+// Add availability slot
+export const addSlot = async (data) => {
+  return API.post("/availability/slot", data);
+};
+
+// Get all schedules
+export const getSchedules = async () => {
+  return API.get("/availability/schedules");
+};
+
+// Get slots for a schedule
+export const getAvailabilitySlots = async (schedule_id) => {
+  return API.get(`/availability/slots/${schedule_id}`);
+};
+
+// BOOKING APIs
+
+// Get available slots for event
+export const getAvailableSlots = async (slug, date) => {
+  return API.get(`/bookings/slots/${slug}?date=${date}`);
+};
+
+// Create booking
+export const createBooking = async (data) => {
+  return API.post("/bookings", data);
+};
+
+// Get all bookings
+export const getBookings = async () => {
+  return API.get("/bookings");
+};
+
+// Cancel booking
+export const cancelBooking = async (id) => {
+  return API.delete(`/bookings/${id}`);
+};
+
+// RESCHEDULE API
+
+export const rescheduleBooking = async (data) => {
+  return API.post("/reschedule", data);
+};
+
+// DATE OVERRIDES API
+
+// Create override
+export const createOverride = async (data) => {
+  return API.post("/overrides", data);
+};
+
+// Get override by date
+export const getOverride = async (date) => {
+  return API.get(`/overrides/${date}`);
+};
+
+export default API;
