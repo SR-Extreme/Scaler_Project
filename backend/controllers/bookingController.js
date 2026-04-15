@@ -1,5 +1,6 @@
 import pool from "../config/postgres.js";
 import { generateAvailableSlots } from "../services/slotService.js";
+import { sendMailerConfirm, sendMailerCancel } from "../utils/sendMailer.js";
 
 // GET AVAILABLE SLOTS
 export const getAvailableSlotsController = async (req, res) => {
@@ -43,7 +44,7 @@ export const createBookingController = async (req, res) => {
       });
     }
 
-    // ✅ Insert booking (DB constraint also prevents double-booking)
+    // Insert booking (DB constraint also prevents double-booking)
     const result = await pool.query(
       `INSERT INTO bookings 
        (event_type_id, name, email, booking_date, start_time, end_time, status)
@@ -51,6 +52,8 @@ export const createBookingController = async (req, res) => {
        RETURNING *`,
       [event_type_id, name, email, date, start_time, end_time]
     );
+
+    await sendMailerConfirm(name, email, date, start_time, end_time);
 
     return res.status(201).json({
       success: true,
@@ -185,10 +188,15 @@ export const cancelBookingController = async (req, res) => {
       });
     }
 
+    const cancelledBooking = result.rows[0];
+    const { name, email, booking_date, start_time, end_time } = cancelledBooking;
+
+    await sendMailerCancel(name, email, booking_date, start_time, end_time);
+
     return res.json({
       success: true,
       message: "Booking cancelled",
-      data: result.rows[0],
+      data: cancelledBooking,
     });
   } catch (err) {
     console.error("Cancel Booking Error:", err.message);

@@ -57,6 +57,9 @@ const Confirmation = () => {
         <div className="mt-1 text-sm text-neutral-600">
           We’ve reserved your time slot.
         </div>
+        <div className="mt-1 text-sm text-neutral-600">
+          Email Confirmation has also been sent to you.
+        </div>
 
         {loading ? (
           <div className="mt-5 rounded-xl border border-dashed border-neutral-300 p-4 text-sm text-neutral-600">
