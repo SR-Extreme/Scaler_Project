@@ -1,5 +1,11 @@
 import express from "express";
-import {createScheduleController,addAvailabilitySlotController,getSchedulesController,getAvailabilityController} from "../controllers/availabilityController.js";
+import {
+  createScheduleController,
+  addAvailabilitySlotController,
+  deleteAvailabilitySlotController,
+  getSchedulesController,
+  getAvailabilityController,
+} from "../controllers/availabilityController.js";
 
 const router = express.Router();
 
@@ -8,6 +14,9 @@ router.post("/schedule", createScheduleController);
 
 // Add Availability Slot
 router.post("/slot", addAvailabilitySlotController);
+
+// Delete Availability Slot
+router.delete("/slot/:slot_id", deleteAvailabilitySlotController);
 
 // Get All Schedules
 router.get("/schedules", getSchedulesController);

@@ -22,6 +22,11 @@ const minutesToTime = (mins) => {
   return `${h}:${m}`;
 };
 
+const isFutureSlot = (date, time) => {
+  const slotDateTime = new Date(`${date}T${time}:00`);
+  return !Number.isNaN(slotDateTime.getTime()) && slotDateTime > new Date();
+};
+
 // MAIN FUNCTION
 export const generateAvailableSlots = async (slug, date) => {
   // 1. Get event type
@@ -104,7 +109,7 @@ export const generateAvailableSlots = async (slug, date) => {
 
   // 7. Remove booked slots
   const availableSlots = allSlots.filter(
-    (slot) => !bookedSlots.includes(slot)
+    (slot) => !bookedSlots.includes(slot) && isFutureSlot(date, slot)
   );
 
   return availableSlots;

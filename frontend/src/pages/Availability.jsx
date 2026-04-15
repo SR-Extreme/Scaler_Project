@@ -1,13 +1,21 @@
+//this page is for checking that slot has been already added or not
 import { useState, useEffect } from "react";
 import {
   createSchedule,
   addSlot,
+  deleteSlot,
   getSchedules,
   getAvailabilitySlots,
 } from "../services/api.js";
 import AppShell from "../components/AppShell.jsx";
 
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+const timeToMinutes = (value) => {
+  if (!value) return NaN;
+  const [hours, minutes] = String(value).slice(0, 5).split(":").map(Number);
+  return hours * 60 + minutes;
+};
 
 const Availability = () => {
   const [scheduleName, setScheduleName] = useState("");
@@ -64,14 +72,54 @@ const Availability = () => {
   // Add slot
   const handleAddSlot = async () => {
     if (!selectedSchedule) return alert("Select schedule first");
+    if (!slotForm.day_of_week || !slotForm.start_time || !slotForm.end_time) {
+      return alert("Please fill day, start time and end time");
+    }
 
-    const res = await addSlot({
-      schedule_id: selectedSchedule,
-      ...slotForm,
+    const newStart = timeToMinutes(slotForm.start_time);
+    const newEnd = timeToMinutes(slotForm.end_time);
+
+    if (newStart >= newEnd) {
+      return alert("End time must be later than start time");
+    }
+
+    const hasOverlap = slots.some((slot) => {
+      if (String(slot.day_of_week) !== String(slotForm.day_of_week)) return false;
+      const existingStart = timeToMinutes(slot.start_time);
+      const existingEnd = timeToMinutes(slot.end_time);
+      return newStart < existingEnd && newEnd > existingStart;
     });
 
-    if (res.data.success) {
-      fetchSlots(selectedSchedule);
+    if (hasOverlap) {
+      return alert("This slot has already been added in availability");
+    }
+
+    try {
+      const res = await addSlot({
+        schedule_id: selectedSchedule,
+        ...slotForm,
+      });
+
+      if (res.data.success) {
+        setSlotForm((prev) => ({ ...prev, start_time: "", end_time: "" }));
+        fetchSlots(selectedSchedule);
+      }
+    } catch (error) {
+      alert(error?.response?.data?.error || "Failed to add slot");
+    }
+  };
+
+  const handleDeleteSlot = async (slotId) => {
+    const confirmed = window.confirm("Delete this slot from availability?");
+    if (!confirmed) return;
+
+    try {
+      const res = await deleteSlot(slotId);
+      if (res.data.success) {
+        fetchSlots(selectedSchedule);
+      }
+    } catch (error) {
+      alert(error?.response?.data?.error || "Failed to delete slot");
     }
   };
 
@@ -196,6 +244,12 @@ const Availability = () => {
                         {dayNames[Number(s.day_of_week)] || `Day ${s.day_of_week}`} •{" "}
                         {String(s.start_time).slice(0, 5)} - {String(s.end_time).slice(0, 5)}
                       </span>
+                      <button
+                        onClick={() => handleDeleteSlot(s.id)}
+                        className="rounded-md border border-red-200 bg-white px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
+                      >
+                        Delete
+                      </button>
                     </div>
                   ))}
                 </div>

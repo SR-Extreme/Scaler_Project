@@ -1,4 +1,10 @@
-import {createSchedule,addAvailabilitySlot,getAvailabilityBySchedule,getSchedulesByUser} from "../queries/availabilityQueries.js";
+import {
+  createSchedule,
+  addAvailabilitySlot,
+  deleteAvailabilitySlot,
+  getAvailabilityBySchedule,
+  getSchedulesByUser,
+} from "../queries/availabilityQueries.js";
 
 // Create Schedule
 export const createScheduleController = async (req, res) => {
@@ -40,6 +46,13 @@ export const addAvailabilitySlotController = async (req, res) => {
       });
     }
 
+    if (start_time >= end_time) {
+      return res.status(400).json({
+        success: false,
+        error: "End time must be later than start time",
+      });
+    }
+
     const slot = await addAvailabilitySlot({
       schedule_id,
       day_of_week,
@@ -56,6 +69,40 @@ export const addAvailabilitySlotController = async (req, res) => {
   } catch (err) {
     console.error("Add Slot Error:", err.message);
 
+    if (err.code === "SLOT_OVERLAP") {
+      return res.status(400).json({
+        success: false,
+        error: "This slot overlaps with an already added slot",
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      error: "Internal Server Error",
+    });
+  }
+};
+
+// Delete Availability Slot
+export const deleteAvailabilitySlotController = async (req, res) => {
+  try {
+    const { slot_id } = req.params;
+    const deletedSlot = await deleteAvailabilitySlot(slot_id);
+
+    if (!deletedSlot) {
+      return res.status(404).json({
+        success: false,
+        error: "Slot not found",
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Availability slot deleted",
+      data: deletedSlot,
+    });
+  } catch (err) {
+    console.error("Delete Slot Error:", err.message);
     return res.status(500).json({
       success: false,
       error: "Internal Server Error",

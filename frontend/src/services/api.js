@@ -52,6 +52,11 @@ export const addSlot = async (data) => {
   return API.post("/availability/slot", data);
 };
 
+// Delete availability slot
+export const deleteSlot = async (slot_id) => {
+  return API.delete(`/availability/slot/${slot_id}`);
+};
+
 // Get all schedules
 export const getSchedules = async () => {
   return API.get("/availability/schedules");

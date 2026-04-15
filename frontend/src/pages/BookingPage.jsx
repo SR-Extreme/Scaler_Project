@@ -7,6 +7,19 @@ import {
 } from "../services/api.js";
 import { useNavigate } from "react-router-dom";
 
+const getTodayLocalDateString = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const isFutureDateTime = (date, time) => {
+  const dateTime = new Date(`${date}T${time}:00`);
+  return !Number.isNaN(dateTime.getTime()) && dateTime > new Date();
+};
+
 const BookingPage = () => {
   const params = useParams();
   const rawSlug = params.slug ?? params["*"] ?? "";
@@ -24,6 +37,7 @@ const BookingPage = () => {
     name: "",
     email: "",
   });
+  const today = getTodayLocalDateString();
 
   // Fetch event info
   useEffect(() => {
@@ -76,6 +90,9 @@ const BookingPage = () => {
   const handleBooking = async () => {
     if (!selectedSlot) return alert("Select a slot");
     if (!event) return alert("Event not loaded");
+    if (!isFutureDateTime(date, selectedSlot)) {
+      return alert("Please select a future slot");
+    }
 
     const endTime = addMinutes(selectedSlot, event.duration);
 
@@ -165,6 +182,7 @@ const BookingPage = () => {
                 <input
                   type="date"
                   value={date}
+                  min={today}
                   className="mt-2 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
                   onChange={(e) => {
                     setDate(e.target.value);

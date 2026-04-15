@@ -2,6 +2,11 @@ import pool from "../config/postgres.js";
 import { generateAvailableSlots } from "../services/slotService.js";
 import { sendMailerConfirm, sendMailerCancel } from "../utils/sendMailer.js";
 
+const isFutureDateTime = (date, time) => {
+  const dateTime = new Date(`${date}T${time}:00`);
+  return !Number.isNaN(dateTime.getTime()) && dateTime > new Date();
+};
+
 // GET AVAILABLE SLOTS
 export const getAvailableSlotsController = async (req, res) => {
   try {
@@ -41,6 +46,13 @@ export const createBookingController = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: "All fields are required",
+      });
+    }
+
+    if (!isFutureDateTime(date, start_time)) {
+      return res.status(400).json({
+        success: false,
+        error: "Cannot book past date/time slots",
       });
     }
 
