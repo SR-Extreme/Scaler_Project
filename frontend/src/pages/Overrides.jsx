@@ -52,12 +52,13 @@ const Overrides = () => {
         } else {
           setMode("BLOCKED");
         }
-      } catch (e) {
+      } catch {
         if (!isActive) return;
         setError("Unable to load override for this date.");
       } finally {
-        if (!isActive) return;
-        setLoading(false);
+        if (isActive) {
+          setLoading(false);
+        }
       }
     })();
 
@@ -142,8 +143,8 @@ const Overrides = () => {
         </div>
       }
     >
-      <div className="grid gap-6 lg:grid-cols-3">
-        <section className="lg:col-span-1">
+      <div className="grid gap-6 xl:grid-cols-12">
+        <section className="xl:col-span-4">
           <div className="text-sm font-semibold">Pick a date</div>
           <div className="mt-3 rounded-xl border border-neutral-200 p-4">
             <label className="text-xs font-medium text-neutral-600">
@@ -162,7 +163,7 @@ const Overrides = () => {
           </div>
         </section>
 
-        <section className="lg:col-span-2 space-y-4">
+        <section className="space-y-4 xl:col-span-8">
           <div className="text-sm font-semibold">Override settings</div>
 
           {notice ? (

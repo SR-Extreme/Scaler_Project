@@ -85,118 +85,146 @@ const CreateEvent = () => {
         </button>
       }
     >
-      <form onSubmit={handleSubmit} className="max-w-xl space-y-4">
-        <div className="space-y-1">
-          <label className="text-sm font-medium text-neutral-800">Title</label>
-          <input
-            type="text"
-            name="title"
-            placeholder="15 Minute Meeting"
-            value={form.title}
-            onChange={handleChange}
-            className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
-            required
-          />
-        </div>
-
-        <div className="space-y-1">
-          <label className="text-sm font-medium text-neutral-800">
-            Description
-          </label>
-          <input
-            type="text"
-            name="description"
-            placeholder="Quick intro call"
-            value={form.description}
-            onChange={handleChange}
-            className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-3">
+        <div className="space-y-4 lg:col-span-2">
           <div className="space-y-1">
-            <label className="text-sm font-medium text-neutral-800">
-              Duration (minutes)
-            </label>
+            <label className="text-sm font-medium text-neutral-800">Title</label>
             <input
-              type="number"
-              name="duration"
-              placeholder="15"
-              value={form.duration}
+              type="text"
+              name="title"
+              placeholder="15 Minute Meeting"
+              value={form.title}
               onChange={handleChange}
               className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
               required
-              min={5}
             />
           </div>
 
           <div className="space-y-1">
             <label className="text-sm font-medium text-neutral-800">
-              Buffer time (minutes)
+              Description
             </label>
             <input
-              type="number"
-              name="buffer_time"
-              placeholder="0"
-              value={form.buffer_time}
+              type="text"
+              name="description"
+              placeholder="Quick intro call"
+              value={form.description}
               onChange={handleChange}
               className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
-              min={0}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-neutral-800">
+                Duration (minutes)
+              </label>
+              <input
+                type="number"
+                name="duration"
+                placeholder="15"
+                value={form.duration}
+                onChange={handleChange}
+                className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
+                required
+                min={5}
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-neutral-800">
+                Buffer time (minutes)
+              </label>
+              <input
+                type="number"
+                name="buffer_time"
+                placeholder="0"
+                value={form.buffer_time}
+                onChange={handleChange}
+                className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
+                min={0}
+              />
+              <p className="text-xs text-neutral-500">
+                Adds a gap after each meeting before the next slot.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-neutral-800">
+                Availability schedule
+              </label>
+              <select
+                name="schedule_id"
+                value={form.schedule_id}
+                onChange={handleChange}
+                className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
+                required
+              >
+                <option value="">Select schedule</option>
+                {schedules.map((sch) => (
+                  <option key={sch.id} value={sch.id}>
+                    {sch.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-neutral-800">
+              URL slug
+            </label>
+            <input
+              type="text"
+              name="slug"
+              placeholder="15min"
+              value={form.slug}
+              onChange={handleChange}
+              className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
+              required
             />
             <p className="text-xs text-neutral-500">
-              Adds a gap after each meeting before the next slot.
+              Public link will be <span className="font-medium">/book/{form.slug || "your-slug"}</span>
             </p>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-neutral-800">
-              Availability schedule
-            </label>
-            <select
-              name="schedule_id"
-              value={form.schedule_id}
-              onChange={handleChange}
-              className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
-              required
+          <div className="pt-2">
+            <button
+              type="submit"
+              className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-neutral-800"
             >
-              <option value="">Select schedule</option>
-              {schedules.map((sch) => (
-                <option key={sch.id} value={sch.id}>
-                  {sch.name}
-                </option>
-              ))}
-            </select>
+              Create event type
+            </button>
           </div>
         </div>
 
-        <div className="space-y-1">
-          <label className="text-sm font-medium text-neutral-800">
-            URL slug
-          </label>
-          <input
-            type="text"
-            name="slug"
-            placeholder="15min"
-            value={form.slug}
-            onChange={handleChange}
-            className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
-            required
-          />
-          <p className="text-xs text-neutral-500">
-            Public link will be <span className="font-medium">/book/{form.slug || "your-slug"}</span>
-          </p>
-        </div>
+        <aside className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+          <div className="text-sm font-semibold text-neutral-900">Live preview</div>
+          <div className="mt-2 text-xs text-neutral-500">
+            This is how your event card will appear on the dashboard.
+          </div>
 
-        <div className="pt-2">
-          <button
-            type="submit"
-            className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-neutral-800"
-          >
-            Create event type
-          </button>
-        </div>
+          <div className="mt-4 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="truncate text-sm font-semibold">
+                  {form.title || "Untitled event"}
+                </div>
+                <div className="mt-1 text-xs text-neutral-600">
+                  {form.description || "No description"}
+                </div>
+              </div>
+              <span className="shrink-0 rounded-full border border-neutral-200 bg-neutral-50 px-2 py-1 text-xs font-medium text-neutral-700">
+                {form.duration || "0"}m
+              </span>
+            </div>
+            <div className="mt-3 text-xs text-neutral-600">
+              URL: <span className="font-medium">/book/{form.slug || "your-slug"}</span>
+            </div>
+          </div>
+        </aside>
       </form>
     </AppShell>
   );

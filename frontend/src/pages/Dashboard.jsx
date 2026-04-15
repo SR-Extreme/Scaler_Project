@@ -43,7 +43,7 @@ const Dashboard = () => {
         </button>
       }
     >
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {events.length === 0 ? (
           <div className="rounded-lg border border-dashed border-neutral-300 p-6 text-sm text-neutral-600">
             No event types yet. Create your first one.
@@ -52,7 +52,7 @@ const Dashboard = () => {
           events.map((event) => (
             <div
               key={event.id}
-              className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm"
+              className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -78,7 +78,7 @@ const Dashboard = () => {
                 Buffer: <span className="font-medium">{Number(event.buffer_time || 0)}m</span>
               </div>
 
-              <div className="mt-4 flex items-center justify-between">
+              <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-3">
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => navigate(`/book/${event.slug}`)}

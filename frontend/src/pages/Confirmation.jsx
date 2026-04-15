@@ -49,8 +49,8 @@ const Confirmation = () => {
       : null;
 
   return (
-    <div className="min-h-screen bg-neutral-50 px-4 py-10 text-neutral-900">
-      <div className="mx-auto max-w-lg rounded-3xl border border-neutral-200 bg-white p-7 shadow-sm">
+    <div className="min-h-dvh bg-neutral-50 px-4 py-8 text-neutral-900 md:px-6">
+      <div className="mx-auto w-full max-w-3xl rounded-3xl border border-neutral-200 bg-white p-7 shadow-sm md:p-9">
         <div className="text-sm font-semibold text-neutral-900">
           Booking confirmed
         </div>

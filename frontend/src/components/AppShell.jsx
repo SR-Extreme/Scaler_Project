@@ -22,7 +22,7 @@ const AppShell = ({ title, right, children }) => {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [mobileSidebarOpen]);
 
-  const SidebarContent = () => (
+  const renderSidebarContent = () => (
     <div className="rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm">
       <div className="px-2 py-3">
         <div className="flex items-center justify-between gap-2">
@@ -127,20 +127,20 @@ const AppShell = ({ title, right, children }) => {
               ✕
             </button>
           </div>
-          <SidebarContent />
+          {renderSidebarContent()}
         </div>
       </div>
 
-      <div className="flex w-full gap-6 px-4 py-6 md:px-6 lg:px-10">
+      <div className="mx-auto flex w-full max-w-[1600px] gap-6 px-4 py-6 md:px-6 lg:px-10">
         {/* Sidebar */}
-        <aside className="hidden w-60 shrink-0 md:block">
+        <aside className="hidden w-64 shrink-0 md:block">
           <div className="sticky top-6">
-            <SidebarContent />
+            {renderSidebarContent()}
           </div>
         </aside>
 
         {/* Main */}
-        <main className="min-w-0 flex-1">
+        <main className="flex min-h-[calc(100dvh-3rem)] min-w-0 flex-1 flex-col">
           <header className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
@@ -170,8 +170,8 @@ const AppShell = ({ title, right, children }) => {
             <div className="flex items-center gap-2">{right}</div>
           </header>
 
-          <div className="rounded-2xl border border-neutral-200 bg-white shadow-sm">
-            <div className="p-5 md:p-6 lg:p-7">{children}</div>
+          <div className="flex flex-1 flex-col rounded-2xl border border-neutral-200 bg-white shadow-sm">
+            <div className="flex-1 p-5 md:p-6 lg:p-7">{children}</div>
           </div>
         </main>
       </div>

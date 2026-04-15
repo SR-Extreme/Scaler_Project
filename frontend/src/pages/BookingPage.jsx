@@ -133,11 +133,11 @@ const BookingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 px-4 py-10 text-neutral-900">
-      <div className="mx-auto w-full max-w-4xl overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-5">
+    <div className="min-h-dvh bg-neutral-50 px-4 py-6 text-neutral-900 md:px-6">
+      <div className="mx-auto w-full max-w-6xl overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-12">
           {/* LEFT: Event info */}
-          <div className="md:col-span-2 border-b border-neutral-200 p-6 md:border-b-0 md:border-r">
+          <div className="md:col-span-4 border-b border-neutral-200 p-6 md:border-b-0 md:border-r md:p-8">
             <div className="text-xs font-medium text-neutral-500">
               {event ? "Scheduling" : "Loading"}
             </div>
@@ -175,7 +175,7 @@ const BookingPage = () => {
           </div>
 
           {/* RIGHT: date + slots + form */}
-          <div className="md:col-span-3 p-6">
+          <div className="md:col-span-8 p-6 md:p-8">
             <div className="grid gap-6 md:grid-cols-2">
               <div>
                 <div className="text-sm font-semibold">Select a date</div>

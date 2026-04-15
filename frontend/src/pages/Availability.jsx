@@ -125,8 +125,8 @@ const Availability = () => {
 
   return (
     <AppShell title="Availability">
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section className="space-y-3">
+      <div className="grid gap-6 xl:grid-cols-12">
+        <section className="space-y-3 xl:col-span-4">
           <div className="text-sm font-semibold">Schedules</div>
 
           <div className="rounded-lg border border-neutral-200 p-4">
@@ -167,7 +167,7 @@ const Availability = () => {
           </div>
         </section>
 
-        <section className="space-y-3">
+        <section className="space-y-3 xl:col-span-8">
           <div className="text-sm font-semibold">Working hours</div>
 
           <div className="rounded-lg border border-neutral-200 p-4">

@@ -38,7 +38,7 @@ const Bookings = () => {
 
   return (
     <AppShell title="Bookings">
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
         {bookings.length === 0 ? (
           <div className="rounded-lg border border-dashed border-neutral-300 p-6 text-sm text-neutral-600">
             No bookings found.
