@@ -24,6 +24,9 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // This rule is too strict for typical data-fetching effects.
+      // Setting state inside an effect is a standard React pattern.
+      'react-hooks/set-state-in-effect': 'off',
     },
   },
 ])

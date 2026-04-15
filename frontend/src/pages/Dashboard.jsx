@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getEvents, deleteEvent } from "../services/api.js";
 import { useNavigate } from "react-router-dom";
+import AppShell from "../components/AppShell.jsx";
 
 const Dashboard = () => {
   const [events, setEvents] = useState([]);
@@ -31,104 +32,76 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex h-screen">
-      
-      {/* Sidebar */}
-      <div className="w-56 bg-black text-white p-5 flex flex-col gap-4">
-        <h2 className="text-xl font-bold">Cal Clone</h2>
-
-        <button
-          onClick={() => navigate("/")}
-          className="text-left hover:text-gray-300"
-        >
-          Dashboard
-        </button>
-
+    <AppShell
+      title="Event types"
+      right={
         <button
           onClick={() => navigate("/create-event")}
-          className="text-left hover:text-gray-300"
+          className="rounded-lg bg-neutral-900 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-neutral-800"
         >
-          Create Event
+          New event type
         </button>
-
-        <button
-          onClick={() => navigate("/availability")}
-          className="text-left hover:text-gray-300"
-        >
-          Availability
-        </button>
-
-        <button
-          onClick={() => navigate("/bookings")}
-          className="text-left hover:text-gray-300"
-        >
-          Bookings
-        </button>
-      </div>
-
-      {/* Main */}
-      <div className="flex-1 p-6 bg-gray-100">
-        
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold">
-            Your Event Types
-          </h1>
-
-          <button
-            onClick={() => navigate("/create-event")}
-            className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800"
-          >
-            + New Event
-          </button>
-        </div>
-
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {events.length === 0 ? (
-            <p>No events found</p>
-          ) : (
-            events.map((event) => (
-              <div
-                key={event.id}
-                className="bg-white p-4 rounded-xl shadow-sm border"
-              >
-                <h3 className="text-lg font-semibold">
-                  {event.title}
-                </h3>
-
-                <p className="text-gray-600 text-sm">
-                  {event.description}
-                </p>
-
-                <p className="text-sm mt-2">
-                  {event.duration} mins
-                </p>
-
-                <div className="flex justify-between mt-4">
-                  <button
-                    onClick={() =>
-                      navigate(`/book/${event.slug}`)
-                    }
-                    className="text-blue-600 hover:underline"
-                  >
-                    View
-                  </button>
-
-                  <button
-                    onClick={() => handleDelete(event.id)}
-                    className="text-red-500 hover:underline"
-                  >
-                    Delete
-                  </button>
+      }
+    >
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {events.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-neutral-300 p-6 text-sm text-neutral-600">
+            No event types yet. Create your first one.
+          </div>
+        ) : (
+          events.map((event) => (
+            <div
+              key={event.id}
+              className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h3 className="truncate text-sm font-semibold">
+                    {event.title}
+                  </h3>
+                  {event.description ? (
+                    <p className="mt-1 line-clamp-2 text-xs text-neutral-600">
+                      {event.description}
+                    </p>
+                  ) : (
+                    <p className="mt-1 text-xs text-neutral-500">
+                      No description
+                    </p>
+                  )}
+                </div>
+                <div className="shrink-0 rounded-full border border-neutral-200 bg-neutral-50 px-2 py-1 text-xs font-medium text-neutral-700">
+                  {event.duration}m
                 </div>
               </div>
-            ))
-          )}
-        </div>
 
+              <div className="mt-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => navigate(`/book/${event.slug}`)}
+                    className="text-sm font-medium text-neutral-900 hover:underline"
+                  >
+                    Open link
+                  </button>
+                  <button
+                    onClick={() => navigate(`/edit-event/${event.id}`)}
+                    className="text-sm font-medium text-neutral-900 hover:underline"
+                  >
+                    Edit
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => handleDelete(event.id)}
+                  className="text-sm font-medium text-red-600 hover:underline"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
-    </div>
+    </AppShell>
   );
 };
 

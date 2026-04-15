@@ -2,7 +2,9 @@ import axios from "axios";
 
 // Create Axios instance
 const API = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL:
+    import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ||
+    "http://localhost:5000/api",
   withCredentials: false, // no auth required
 });
 
@@ -13,6 +15,11 @@ export const getEvents = async () => {
   return API.get("/events");
 };
 
+// Get event by slug
+export const getEventBySlug = async (slug) => {
+  return API.get(`/events/${encodeURIComponent(slug)}`);
+};
+
 // Create event
 export const createEvent = async (data) => {
   return API.post("/events", data);
@@ -21,6 +28,16 @@ export const createEvent = async (data) => {
 // Delete event
 export const deleteEvent = async (id) => {
   return API.delete(`/events/${id}`);
+};
+
+// Get event by id (for editing)
+export const getEventById = async (id) => {
+  return API.get(`/events/id/${id}`);
+};
+
+// Update event
+export const updateEvent = async (id, data) => {
+  return API.put(`/events/${id}`, data);
 };
 
 // AVAILABILITY APIs
@@ -65,6 +82,11 @@ export const getBookings = async () => {
 // Cancel booking
 export const cancelBooking = async (id) => {
   return API.delete(`/bookings/${id}`);
+};
+
+// Get booking by id (for confirmation deep link)
+export const getBooking = async (id) => {
+  return API.get(`/bookings/${id}`);
 };
 
 // RESCHEDULE API

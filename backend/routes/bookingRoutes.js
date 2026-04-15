@@ -1,5 +1,11 @@
 import express from "express";
-import {getAvailableSlotsController,createBookingController,getBookingsController,cancelBookingController} from "../controllers/bookingController.js";
+import {
+  getAvailableSlotsController,
+  createBookingController,
+  getBookingsController,
+  getBookingByIdController,
+  cancelBookingController,
+} from "../controllers/bookingController.js";
 
 const router = express.Router();
 
@@ -11,6 +17,9 @@ router.post("/", createBookingController);
 
 // Get all bookings
 router.get("/", getBookingsController);
+
+// Get booking by id (confirmation deep link)
+router.get("/:id", getBookingByIdController);
 
 // Cancel booking
 router.delete("/:id", cancelBookingController);

@@ -3,12 +3,14 @@ import { useParams } from "react-router-dom";
 import {
   getAvailableSlots,
   createBooking,
-  getEvents,
+  getEventBySlug,
 } from "../services/api.js";
 import { useNavigate } from "react-router-dom";
 
 const BookingPage = () => {
-  const { slug } = useParams();
+  const params = useParams();
+  const rawSlug = params.slug ?? params["*"] ?? "";
+  const slug = rawSlug.split("/").filter(Boolean).pop().toLowerCase() || "";
   const navigate = useNavigate();
 
   const [date, setDate] = useState("");
@@ -16,6 +18,7 @@ const BookingPage = () => {
   const [selectedSlot, setSelectedSlot] = useState("");
 
   const [event, setEvent] = useState(null);
+  const [error, setError] = useState("");
 
   const [form, setForm] = useState({
     name: "",
@@ -23,37 +26,56 @@ const BookingPage = () => {
   });
 
   // Fetch event info
-  const fetchEvent = async () => {
-    const res = await getEvents();
-    const found = res.data.data.find((e) => e.slug === slug);
-    setEvent(found);
-  };
-
   useEffect(() => {
-    fetchEvent();
-  }, []);
+    if (!slug) return;
+    let isActive = true;
+
+    (async () => {
+      try {
+        const res = await getEventBySlug(slug);
+        const found = res.data.data;
+        if (!isActive) return;
+        setEvent(found || null);
+        setError(found ? "" : "Event not found");
+      } catch (err) {
+        console.error(err);
+        if (!isActive) return;
+        setEvent(null);
+        setError("Unable to load event");
+      }
+    })();
+
+    return () => {
+      isActive = false;
+    };
+  }, [slug]);
 
   // Fetch slots
-  const fetchSlots = async () => {
-    if (!date) return;
-
-    try {
-      const res = await getAvailableSlots(slug, date);
-      if (res.data.success) {
-        setSlots(res.data.data);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   useEffect(() => {
-    fetchSlots();
-  }, [date]);
+    if (!date || !slug) return;
+    let isActive = true;
+
+    (async () => {
+      try {
+        const res = await getAvailableSlots(slug, date);
+        if (!isActive) return;
+        if (res.data.success) setSlots(res.data.data);
+      } catch (err) {
+        console.error(err);
+        if (!isActive) return;
+        setSlots([]);
+      }
+    })();
+
+    return () => {
+      isActive = false;
+    };
+  }, [date, slug]);
 
   // Booking
   const handleBooking = async () => {
     if (!selectedSlot) return alert("Select a slot");
+    if (!event) return alert("Event not loaded");
 
     const endTime = addMinutes(selectedSlot, event.duration);
 
@@ -68,13 +90,14 @@ const BookingPage = () => {
       });
 
       if (res.data.success) {
-        navigate("/confirmation", {
-  state: {
-    name: form.name,
-    date,
-    time: selectedSlot,
-  },
-});
+        const bookingId = res.data.data?.id;
+        navigate(`/confirmation${bookingId ? `?bookingId=${bookingId}` : ""}`, {
+          state: {
+            name: form.name,
+            date,
+            time: selectedSlot,
+          },
+        });
       }
     } catch (err) {
       alert(err.response?.data?.error || "Booking failed");
@@ -93,76 +116,121 @@ const BookingPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
-      
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-4xl flex">
-        
-        {/* LEFT: DATE */}
-        <div className="w-1/2 p-6 border-r">
-          <h2 className="text-xl font-semibold mb-4">
-            Select Date
-          </h2>
+    <div className="min-h-screen bg-neutral-50 px-4 py-10 text-neutral-900">
+      <div className="mx-auto w-full max-w-4xl overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-5">
+          {/* LEFT: Event info */}
+          <div className="md:col-span-2 border-b border-neutral-200 p-6 md:border-b-0 md:border-r">
+            <div className="text-xs font-medium text-neutral-500">
+              {event ? "Scheduling" : "Loading"}
+            </div>
+            <h1 className="mt-1 text-lg font-semibold tracking-tight">
+              {event?.title || "Event"}
+            </h1>
+            {event?.description ? (
+              <p className="mt-2 text-sm text-neutral-600">
+                {event.description}
+              </p>
+            ) : null}
 
-          <input
-            type="date"
-            className="border p-2 rounded-lg w-full"
-            onChange={(e) => setDate(e.target.value)}
-          />
-        </div>
+            <div className="mt-4 space-y-2 text-sm text-neutral-700">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-neutral-500">Duration</span>
+                <span className="font-medium">{event?.duration ?? "-"}m</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-neutral-500">Selected</span>
+                <span className="font-medium">
+                  {date && selectedSlot ? `${date} • ${selectedSlot}` : "—"}
+                </span>
+              </div>
+            </div>
 
-        {/* RIGHT: SLOTS + FORM */}
-        <div className="w-1/2 p-6">
-          
-          <h2 className="text-xl font-semibold mb-4">
-            Available Slots
-          </h2>
-
-          {/* Slots */}
-          <div className="grid grid-cols-2 gap-2 mb-4">
-            {slots.length === 0 ? (
-              <p>No slots</p>
-            ) : (
-              slots.map((slot) => (
-                <button
-                  key={slot}
-                  onClick={() => setSelectedSlot(slot)}
-                  className={`border rounded-lg py-2 ${
-                    selectedSlot === slot
-                      ? "bg-black text-white"
-                      : "hover:bg-gray-200"
-                  }`}
-                >
-                  {slot}
-                </button>
-              ))
-            )}
+            {error ? (
+              <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                {error}
+              </div>
+            ) : null}
           </div>
 
-          {/* Form */}
-          <input
-            type="text"
-            placeholder="Your Name"
-            className="border p-2 rounded-lg w-full mb-3"
-            onChange={(e) =>
-              setForm({ ...form, name: e.target.value })
-            }
-          />
+          {/* RIGHT: date + slots + form */}
+          <div className="md:col-span-3 p-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div>
+                <div className="text-sm font-semibold">Select a date</div>
+                <input
+                  type="date"
+                  value={date}
+                  className="mt-2 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
+                  onChange={(e) => {
+                    setDate(e.target.value);
+                    setSelectedSlot("");
+                  }}
+                />
+              </div>
 
-          <input
-            type="email"
-            placeholder="Your Email"
-            className="border p-2 rounded-lg w-full mb-3"
-            onChange={(e) =>
-              setForm({ ...form, email: e.target.value })
-            }
-          />
+              <div>
+                <div className="text-sm font-semibold">Available times</div>
+                <div className="mt-2 max-h-64 overflow-auto rounded-xl border border-neutral-200 p-2">
+                  {date ? (
+                    slots.length === 0 ? (
+                      <div className="p-3 text-sm text-neutral-600">
+                        No available times.
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2">
+                        {slots.map((slot) => (
+                          <button
+                            key={slot}
+                            onClick={() => setSelectedSlot(slot)}
+                            className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${selectedSlot === slot
+                              ? "border-neutral-900 bg-neutral-900 text-white"
+                              : "border-neutral-200 bg-white text-neutral-900 hover:bg-neutral-50"
+                              }`}
+                          >
+                            {slot}
+                          </button>
+                        ))}
+                      </div>
+                    )
+                  ) : (
+                    <div className="p-3 text-sm text-neutral-600">
+                      Pick a date to see times.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
 
-          <button
-            onClick={handleBooking}
-            className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800"
-          >
-            Book Now
-          </button>
+            <div className="mt-6 border-t border-neutral-200 pt-6">
+              <div className="text-sm font-semibold">Your details</div>
+              <div className="mt-3 grid gap-3">
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={form.name}
+                  className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                />
+
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={form.email}
+                  className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                />
+
+                <button
+                  onClick={handleBooking}
+                  disabled={!date || !selectedSlot || !form.name || !form.email}
+                  className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 disabled:cursor-not-allowed disabled:bg-neutral-300"
+                >
+                  Confirm booking
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

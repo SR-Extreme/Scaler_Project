@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { createEvent, getSchedules } from "../services/api.js";
 import { useNavigate } from "react-router-dom";
+import AppShell from "../components/AppShell.jsx";
 
 const CreateEvent = () => {
   const navigate = useNavigate();
@@ -31,11 +32,21 @@ const CreateEvent = () => {
     fetchSchedules();
   }, []);
 
+  const sanitizeSlug = (value) => {
+    const lastPart = value.trim().split("/").filter(Boolean).pop() || "";
+    return lastPart
+      .toLowerCase()
+      .replace(/[^a-zA-Z0-9-_]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  };
+
   // Handle input change
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setForm({
       ...form,
-      [e.target.name]: e.target.value,
+      [name]: name === "slug" ? sanitizeSlug(value) : value,
     });
   };
 
@@ -60,86 +71,112 @@ const CreateEvent = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
-        
-        <h2 className="text-2xl font-semibold mb-6 text-center">
-          Create Event
-        </h2>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-
-          {/* Title */}
+    <AppShell
+      title="Create event type"
+      right={
+        <button
+          onClick={() => navigate("/")}
+          className="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm font-medium text-neutral-800 shadow-sm hover:bg-neutral-50"
+          type="button"
+        >
+          Back
+        </button>
+      }
+    >
+      <form onSubmit={handleSubmit} className="max-w-xl space-y-4">
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-neutral-800">Title</label>
           <input
             type="text"
             name="title"
-            placeholder="Event Title"
+            placeholder="15 Minute Meeting"
             value={form.title}
             onChange={handleChange}
-            className="w-full border p-2 rounded-lg"
+            className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
             required
           />
+        </div>
 
-          {/* Description */}
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-neutral-800">
+            Description
+          </label>
           <input
             type="text"
             name="description"
-            placeholder="Description"
+            placeholder="Quick intro call"
             value={form.description}
             onChange={handleChange}
-            className="w-full border p-2 rounded-lg"
+            className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
           />
+        </div>
 
-          {/* Duration */}
-          <input
-            type="number"
-            name="duration"
-            placeholder="Duration (minutes)"
-            value={form.duration}
-            onChange={handleChange}
-            className="w-full border p-2 rounded-lg"
-            required
-          />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-neutral-800">
+              Duration (minutes)
+            </label>
+            <input
+              type="number"
+              name="duration"
+              placeholder="15"
+              value={form.duration}
+              onChange={handleChange}
+              className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
+              required
+              min={5}
+            />
+          </div>
 
-          {/* Slug */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-neutral-800">
+              Availability schedule
+            </label>
+            <select
+              name="schedule_id"
+              value={form.schedule_id}
+              onChange={handleChange}
+              className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
+              required
+            >
+              <option value="">Select schedule</option>
+              {schedules.map((sch) => (
+                <option key={sch.id} value={sch.id}>
+                  {sch.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-neutral-800">
+            URL slug
+          </label>
           <input
             type="text"
             name="slug"
-            placeholder="Slug (unique URL)"
+            placeholder="15min"
             value={form.slug}
             onChange={handleChange}
-            className="w-full border p-2 rounded-lg"
+            className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
             required
           />
+          <p className="text-xs text-neutral-500">
+            Public link will be <span className="font-medium">/book/{form.slug || "your-slug"}</span>
+          </p>
+        </div>
 
-          {/* Schedule Dropdown */}
-          <select
-            name="schedule_id"
-            value={form.schedule_id}
-            onChange={handleChange}
-            className="w-full border p-2 rounded-lg"
-            required
-          >
-            <option value="">Select Schedule</option>
-            {schedules.map((sch) => (
-              <option key={sch.id} value={sch.id}>
-                {sch.name}
-              </option>
-            ))}
-          </select>
-
-          {/* Submit */}
+        <div className="pt-2">
           <button
             type="submit"
-            className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800"
+            className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-neutral-800"
           >
-            Create Event
+            Create event type
           </button>
-        </form>
-
-      </div>
-    </div>
+        </div>
+      </form>
+    </AppShell>
   );
 };
 

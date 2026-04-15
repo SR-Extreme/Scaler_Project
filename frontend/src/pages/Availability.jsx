@@ -5,6 +5,9 @@ import {
   getSchedules,
   getAvailabilitySlots,
 } from "../services/api.js";
+import AppShell from "../components/AppShell.jsx";
+
+const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 const Availability = () => {
   const [scheduleName, setScheduleName] = useState("");
@@ -17,6 +20,7 @@ const Availability = () => {
     day_of_week: "",
     start_time: "",
     end_time: "",
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
   });
 
   // Fetch schedules
@@ -72,118 +76,135 @@ const Availability = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      
-      <h1 className="text-2xl font-semibold mb-6">
-        Availability
-      </h1>
+    <AppShell title="Availability">
+      <div className="grid gap-6 lg:grid-cols-2">
+        <section className="space-y-3">
+          <div className="text-sm font-semibold">Schedules</div>
 
-      {/* Create Schedule */}
-      <div className="bg-white p-4 rounded-xl shadow mb-6">
-        <h2 className="font-semibold mb-3">Create Schedule</h2>
+          <div className="rounded-lg border border-neutral-200 p-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <input
+                type="text"
+                placeholder="New schedule name"
+                value={scheduleName}
+                onChange={(e) => setScheduleName(e.target.value)}
+                className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
+              />
 
-        <div className="flex gap-3">
-          <input
-            type="text"
-            placeholder="Schedule Name"
-            value={scheduleName}
-            onChange={(e) => setScheduleName(e.target.value)}
-            className="border p-2 rounded-lg w-full"
-          />
-
-          <button
-            onClick={handleCreateSchedule}
-            className="bg-black text-white px-4 rounded-lg"
-          >
-            Create
-          </button>
-        </div>
-      </div>
-
-      {/* Select Schedule */}
-      <div className="bg-white p-4 rounded-xl shadow mb-6">
-        <h2 className="font-semibold mb-3">Select Schedule</h2>
-
-        <select
-          className="border p-2 rounded-lg w-full"
-          onChange={(e) => handleSelect(e.target.value)}
-        >
-          <option value="">Choose Schedule</option>
-          {schedules.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Add Slot */}
-      <div className="bg-white p-4 rounded-xl shadow mb-6">
-        <h2 className="font-semibold mb-3">Add Slot</h2>
-
-        <div className="grid grid-cols-3 gap-3">
-          
-          <select
-            onChange={(e) =>
-              setSlotForm({ ...slotForm, day_of_week: e.target.value })
-            }
-            className="border p-2 rounded-lg"
-          >
-            <option value="">Day</option>
-            <option value="0">Sunday</option>
-            <option value="1">Monday</option>
-            <option value="2">Tuesday</option>
-            <option value="3">Wednesday</option>
-            <option value="4">Thursday</option>
-            <option value="5">Friday</option>
-            <option value="6">Saturday</option>
-          </select>
-
-          <input
-            type="time"
-            onChange={(e) =>
-              setSlotForm({ ...slotForm, start_time: e.target.value })
-            }
-            className="border p-2 rounded-lg"
-          />
-
-          <input
-            type="time"
-            onChange={(e) =>
-              setSlotForm({ ...slotForm, end_time: e.target.value })
-            }
-            className="border p-2 rounded-lg"
-          />
-        </div>
-
-        <button
-          onClick={handleAddSlot}
-          className="mt-4 bg-black text-white px-4 py-2 rounded-lg"
-        >
-          Add Slot
-        </button>
-      </div>
-
-      {/* Slots List */}
-      <div className="bg-white p-4 rounded-xl shadow">
-        <h2 className="font-semibold mb-3">Slots</h2>
-
-        {slots.length === 0 ? (
-          <p>No slots</p>
-        ) : (
-          slots.map((s) => (
-            <div
-              key={s.id}
-              className="border p-2 rounded mb-2 flex justify-between"
-            >
-              <span>
-                Day {s.day_of_week} | {s.start_time} - {s.end_time}
-              </span>
+              <button
+                onClick={handleCreateSchedule}
+                className="shrink-0 rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white hover:bg-neutral-800"
+              >
+                Create
+              </button>
             </div>
-          ))
-        )}
+          </div>
+
+          <div className="rounded-lg border border-neutral-200 p-4">
+            <div className="text-xs font-medium text-neutral-600">
+              Select schedule
+            </div>
+            <select
+              value={selectedSchedule}
+              className="mt-2 w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
+              onChange={(e) => handleSelect(e.target.value)}
+            >
+              <option value="">Choose schedule</option>
+              {schedules.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <div className="text-sm font-semibold">Working hours</div>
+
+          <div className="rounded-lg border border-neutral-200 p-4">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+              <select
+                value={slotForm.day_of_week}
+                onChange={(e) =>
+                  setSlotForm({ ...slotForm, day_of_week: e.target.value })
+                }
+                className="rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
+              >
+                <option value="">Day</option>
+                <option value="1">Monday</option>
+                <option value="2">Tuesday</option>
+                <option value="3">Wednesday</option>
+                <option value="4">Thursday</option>
+                <option value="5">Friday</option>
+                <option value="6">Saturday</option>
+                <option value="0">Sunday</option>
+              </select>
+
+              <input
+                type="time"
+                value={slotForm.start_time}
+                onChange={(e) =>
+                  setSlotForm({ ...slotForm, start_time: e.target.value })
+                }
+                className="rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
+              />
+
+              <input
+                type="time"
+                value={slotForm.end_time}
+                onChange={(e) =>
+                  setSlotForm({ ...slotForm, end_time: e.target.value })
+                }
+                className="rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
+              />
+
+              <input
+                type="text"
+                value={slotForm.timezone}
+                onChange={(e) =>
+                  setSlotForm({ ...slotForm, timezone: e.target.value })
+                }
+                placeholder="Timezone (e.g. Asia/Kolkata)"
+                className="rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
+              />
+            </div>
+
+            <button
+              onClick={handleAddSlot}
+              className="mt-3 rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white hover:bg-neutral-800"
+            >
+              Add time range
+            </button>
+          </div>
+
+          <div className="rounded-lg border border-neutral-200">
+            <div className="border-b border-neutral-200 p-4 text-sm font-semibold">
+              Current slots
+            </div>
+            <div className="p-4">
+              {slots.length === 0 ? (
+                <div className="text-sm text-neutral-600">No slots yet.</div>
+              ) : (
+                <div className="space-y-2">
+                  {slots.map((s) => (
+                    <div
+                      key={s.id}
+                      className="flex items-center justify-between rounded-md border border-neutral-200 px-3 py-2 text-sm"
+                    >
+                      <span className="text-neutral-800">
+                        {dayNames[Number(s.day_of_week)] || `Day ${s.day_of_week}`} •{" "}
+                        {String(s.start_time).slice(0, 5)} - {String(s.end_time).slice(0, 5)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
       </div>
-    </div>
+    </AppShell>
   );
 };
 
