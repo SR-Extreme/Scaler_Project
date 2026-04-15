@@ -22,7 +22,18 @@ const corsOptions = {
     if (!origin) return callback(null, true);
 
     const normalizedOrigin = origin.replace(/\/$/, "");
+    let isVercelOrigin = false;
+    try {
+      const hostname = new URL(normalizedOrigin).hostname;
+      isVercelOrigin = hostname.endsWith(".vercel.app");
+    } catch {
+      isVercelOrigin = false;
+    }
+
     if (allowedOrigins.includes(normalizedOrigin)) {
+      return callback(null, true);
+    }
+    if (isVercelOrigin) {
       return callback(null, true);
     }
 
@@ -33,7 +44,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 
 app.use("/api/events", eventRoutes);
 app.use("/api/availability", availabilityRoutes);
