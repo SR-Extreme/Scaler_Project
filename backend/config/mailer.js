@@ -15,6 +15,10 @@ const transporter = nodemailer.createTransport({
     host: mailHost,
     port: mailPort,
     secure: mailSecure,
+    // Render instances often don't have working IPv6 egress for SMTP.
+    lookup: (hostname, options, callback) => {
+        dns.lookup(hostname, { ...options, family: 4, all: false }, callback);
+    },
     auth: {
         user: process.env.EMAIL_USER?.trim(),
         pass: process.env.EMAIL_PASSWORD?.trim(),
