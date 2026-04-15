@@ -1,4 +1,8 @@
-import {createOverride,getOverrideByDate} from "../queries/overrideQueries.js";
+import {
+  createOverride,
+  getOverrideByDate,
+  deleteOverrideByDate,
+} from "../queries/overrideQueries.js";
 
 // Create Override
 export const createOverrideController = async (req, res) => {
@@ -48,6 +52,34 @@ export const getOverrideController = async (req, res) => {
     });
   } catch (err) {
     console.error("Get Override Error:", err.message);
+
+    return res.status(500).json({
+      success: false,
+      error: "Internal Server Error",
+    });
+  }
+};
+
+// Delete Override
+export const deleteOverrideController = async (req, res) => {
+  try {
+    const { date } = req.params;
+
+    const deleted = await deleteOverrideByDate(1, date);
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        error: "Override not found",
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Override cancelled",
+      data: deleted,
+    });
+  } catch (err) {
+    console.error("Delete Override Error:", err.message);
 
     return res.status(500).json({
       success: false,

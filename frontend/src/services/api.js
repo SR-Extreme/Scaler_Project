@@ -107,4 +107,9 @@ export const getOverride = async (date) => {
   return API.get(`/overrides/${date}`);
 };
 
+// Cancel override by date
+export const cancelOverride = async (date) => {
+  return API.delete(`/overrides/${date}`);
+};
+
 export default API;

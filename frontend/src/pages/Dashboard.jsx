@@ -74,6 +74,10 @@ const Dashboard = () => {
                 </div>
               </div>
 
+              <div className="mt-2 text-xs text-neutral-600">
+                Buffer: <span className="font-medium">{Number(event.buffer_time || 0)}m</span>
+              </div>
+
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <button

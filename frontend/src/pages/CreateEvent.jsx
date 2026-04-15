@@ -10,6 +10,7 @@ const CreateEvent = () => {
     title: "",
     description: "",
     duration: "",
+    buffer_time: "0",
     slug: "",
     schedule_id: "",
   });
@@ -58,6 +59,7 @@ const CreateEvent = () => {
       const res = await createEvent({
         ...form,
         duration: Number(form.duration),
+        buffer_time: Number(form.buffer_time || 0),
       });
 
       if (res.data.success) {
@@ -128,6 +130,26 @@ const CreateEvent = () => {
             />
           </div>
 
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-neutral-800">
+              Buffer time (minutes)
+            </label>
+            <input
+              type="number"
+              name="buffer_time"
+              placeholder="0"
+              value={form.buffer_time}
+              onChange={handleChange}
+              className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400"
+              min={0}
+            />
+            <p className="text-xs text-neutral-500">
+              Adds a gap after each meeting before the next slot.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="space-y-1">
             <label className="text-sm font-medium text-neutral-800">
               Availability schedule

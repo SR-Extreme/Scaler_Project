@@ -25,3 +25,15 @@ export const getOverrideByDate = async (user_id, date) => {
 
   return result.rows[0];
 };
+
+// Delete Override by Date
+export const deleteOverrideByDate = async (user_id, date) => {
+  const result = await pool.query(
+    `DELETE FROM date_overrides
+     WHERE user_id = $1 AND override_date = $2
+     RETURNING *`,
+    [user_id, date]
+  );
+
+  return result.rows[0];
+};

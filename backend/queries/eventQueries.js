@@ -2,15 +2,15 @@ import pool from "../config/postgres.js";
 
 // Create Event
 export const createEvent = async (data) => {
-  const { title, description, duration, slug, schedule_id } = data;
+  const { title, description, duration, slug, schedule_id, buffer_time = 0 } = data;
 
   const query = `
-    INSERT INTO event_types (user_id, title, description, duration, slug, schedule_id)
-    VALUES ($1, $2, $3, $4, $5, $6)
+    INSERT INTO event_types (user_id, title, description, duration, slug, schedule_id, buffer_time)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
     RETURNING *;
   `;
 
-  const values = [1, title, description, duration, slug, schedule_id];
+  const values = [1, title, description, duration, slug, schedule_id, buffer_time];
 
   const result = await pool.query(query, values);
   return result.rows[0];
@@ -42,7 +42,7 @@ export const getEventBySlug = async (slug) => {
 
 // Update Event
 export const updateEvent = async (id, data) => {
-  const { title, description, duration, slug, schedule_id } = data;
+  const { title, description, duration, slug, schedule_id, buffer_time = 0 } = data;
 
   const result = await pool.query(
     `UPDATE event_types
@@ -50,10 +50,11 @@ export const updateEvent = async (id, data) => {
          description = $2,
          duration = $3,
          slug = $4,
-         schedule_id = $5
-     WHERE id = $6
+         schedule_id = $5,
+         buffer_time = $6
+     WHERE id = $7
      RETURNING *`,
-    [title, description || null, duration, slug, schedule_id, id]
+    [title, description || null, duration, slug, schedule_id, buffer_time, id]
   );
 
   return result.rows[0];

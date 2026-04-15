@@ -10,7 +10,7 @@ import {
 // Create Event
 export const createEventController = async (req, res) => {
   try {
-    const { title, description, duration, slug, schedule_id } = req.body;
+    const { title, description, duration, slug, schedule_id, buffer_time } = req.body;
 
     if (!title || !duration || !slug || !schedule_id) {
       return res.status(400).json({
@@ -25,6 +25,7 @@ export const createEventController = async (req, res) => {
       duration,
       slug,
       schedule_id,
+      buffer_time: Number.isFinite(Number(buffer_time)) ? Number(buffer_time) : 0,
     });
 
     res.status(201).json({ success: true, message: "Event created successfully", data: event });
@@ -94,7 +95,7 @@ export const getEventByIdController = async (req, res) => {
 export const updateEventController = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, duration, slug, schedule_id } = req.body;
+    const { title, description, duration, slug, schedule_id, buffer_time } = req.body;
 
     if (!title || !duration || !slug || !schedule_id) {
       return res.status(400).json({
@@ -109,6 +110,7 @@ export const updateEventController = async (req, res) => {
       duration,
       slug,
       schedule_id,
+      buffer_time: Number.isFinite(Number(buffer_time)) ? Number(buffer_time) : 0,
     });
 
     if (!updated) {

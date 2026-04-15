@@ -139,6 +139,10 @@ const BookingPage = () => {
                 <span className="font-medium">{event?.duration ?? "-"}m</span>
               </div>
               <div className="flex items-center justify-between gap-3">
+                <span className="text-neutral-500">Buffer</span>
+                <span className="font-medium">{Number(event?.buffer_time || 0)}m</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
                 <span className="text-neutral-500">Selected</span>
                 <span className="font-medium">
                   {date && selectedSlot ? `${date} • ${selectedSlot}` : "—"}

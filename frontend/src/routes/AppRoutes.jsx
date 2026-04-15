@@ -5,6 +5,7 @@ import Dashboard from "../pages/Dashboard.jsx";
 import CreateEvent from "../pages/CreateEvent.jsx";
 import EditEvent from "../pages/EditEvent.jsx";
 import Availability from "../pages/Availability.jsx";
+import Overrides from "../pages/Overrides.jsx";
 import BookingPage from "../pages/BookingPage.jsx";
 import Bookings from "../pages/Bookings.jsx";
 import Confirmation from "../pages/Confirmation.jsx";
@@ -16,6 +17,7 @@ const AppRoutes = () => {
       <Route path="/create-event" element={<CreateEvent />} />
       <Route path="/edit-event/:id" element={<EditEvent />} />
       <Route path="/availability" element={<Availability />} />
+      <Route path="/overrides" element={<Overrides />} />
       <Route path="/bookings" element={<Bookings />} />
       <Route path="/book/:slug" element={<BookingPage />} />
       <Route path="/book/*" element={<BookingPage />} />
