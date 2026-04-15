@@ -2,7 +2,7 @@ import transporter from "../config/mailer.js";
 
 const sendMailerConfirm = async (name, email, date, start_time, end_time) => {
   const mailOptions = {
-    from: `Cal.com:${process.env.EMAIL_USER}`,
+    from: `Cal.com <${process.env.EMAIL_USER}>`,
     to: email,
     subject: "Booking Confirmation",
     html: `
@@ -99,7 +99,7 @@ const sendMailerConfirm = async (name, email, date, start_time, end_time) => {
 
 const sendMailerCancel = async (name, email, date, start_time, end_time) => {
   const mailOptions = {
-    from: `Cal.com:${process.env.EMAIL_USER}`,
+    from: `Cal.com <${process.env.EMAIL_USER}>`,
     to: email,
     subject: "Booking Cancellation",
     html: `

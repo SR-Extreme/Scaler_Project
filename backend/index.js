@@ -6,6 +6,7 @@ import availabilityRoutes from "./routes/availabilityRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import overrideRoutes from "./routes/overrideRoutes.js";
 import cors from "cors";
+import { verifyMailerConnection } from "./config/mailer.js";
 
 dotenv.config();
 
@@ -56,4 +57,5 @@ connectDB();
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
   console.log(`Allowed origins: ${allowedOrigins.join(", ") || "none configured"}`);
+  verifyMailerConnection();
 });
