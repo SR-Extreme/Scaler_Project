@@ -11,15 +11,29 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-const allowedOrigins = process.env.FRONTEND_URL
-  ? process.env.FRONTEND_URL.split(",").map((origin) => origin.trim())
-  : [];
+const allowedOrigins = (process.env.FRONTEND_URL || "")
+  .split(",")
+  .map((origin) => origin.trim().replace(/\/$/, ""))
+  .filter(Boolean);
 
-app.use(
-  cors({
-    origin: allowedOrigins.length > 0 ? allowedOrigins : "*",
-  })
-);
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser requests (no Origin header) like health checks/Postman.
+    if (!origin) return callback(null, true);
+
+    const normalizedOrigin = origin.replace(/\/$/, "");
+    if (allowedOrigins.includes(normalizedOrigin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use("/api/events", eventRoutes);
 app.use("/api/availability", availabilityRoutes);
@@ -30,4 +44,5 @@ connectDB();
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
+  console.log(`Allowed origins: ${allowedOrigins.join(", ") || "none configured"}`);
 });
