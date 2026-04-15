@@ -10,10 +10,11 @@
     "start": "nodemon index.js"
   },
   "dependencies": {
+    "@emailjs/nodejs": "^5.0.2",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
+    "emailjs": "^5.0.0",
     "express": "^5.2.1",
-    "nodemailer": "^8.0.5",
     "nodemon": "^3.1.14",
     "pg": "^8.20.0",
     "resend": "^6.12.0"
