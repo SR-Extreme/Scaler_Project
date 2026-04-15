@@ -2,6 +2,12 @@ import pool from "../config/postgres.js";
 import { generateAvailableSlots } from "../services/slotService.js";
 import { sendMailerConfirm, sendMailerCancel } from "../utils/sendMailer.js";
 
+const sendEmailSafely = (emailPromise, label) => {
+  Promise.resolve(emailPromise).catch((error) => {
+    console.error(`${label} Email Error:`, error.message);
+  });
+};
+
 const isFutureDateTime = (date, time) => {
   const dateTime = new Date(`${date}T${time}:00`);
   return !Number.isNaN(dateTime.getTime()) && dateTime > new Date();
@@ -65,7 +71,11 @@ export const createBookingController = async (req, res) => {
       [event_type_id, name, email, date, start_time, end_time]
     );
 
-    await sendMailerConfirm(name, email, date, start_time, end_time);
+    // Booking success should not depend on mail server availability.
+    sendEmailSafely(
+      sendMailerConfirm(name, email, date, start_time, end_time),
+      "Booking Confirmation"
+    );
 
     return res.status(201).json({
       success: true,
@@ -203,7 +213,11 @@ export const cancelBookingController = async (req, res) => {
     const cancelledBooking = result.rows[0];
     const { name, email, booking_date, start_time, end_time } = cancelledBooking;
 
-    await sendMailerCancel(name, email, booking_date, start_time, end_time);
+    // Cancellation should complete even if email fails.
+    sendEmailSafely(
+      sendMailerCancel(name, email, booking_date, start_time, end_time),
+      "Booking Cancellation"
+    );
 
     return res.json({
       success: true,
