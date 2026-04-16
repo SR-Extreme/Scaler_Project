@@ -8,17 +8,17 @@ Fullstack scheduling/booking app inspired by Cal.com.
 - **DB**: PostgreSQL (via `pg`)
 
 ### Core Features Implemented
-- **Event types**: create/list/delete, unique slug public link
-- **Availability**: schedules + day/time ranges
-- **Public booking page**: date picker, available slots, booking form, double-booking prevention
-- **Bookings dashboard**: list bookings, cancel booking (sets status to `CANCELLED`)
-- **(Bonus)**: date overrides + responsiveness + Multiple availability schedules + Email notifications on booking confirmation/cancellation + Buffer time between meetings 
+- **Event types**: create/edit/delete, unique slug public link, per-event buffer time
+- **Availability**: availability schedules + day/time ranges (overlapping ranges blocked; timezone is stored)
+- **Public booking page**: date picker, available slots, booking form, double-booking prevention (`BOOKED` vs `CANCELLED`)
+- **Bookings dashboard**: list bookings, cancel booking (sets status to `CANCELLED`), email notifications
+- **(Bonus)**: date overrides (per-date availability/time window) + responsiveness
 
 ### Assumptions
 - **No auth**: the admin side uses a fixed `user_id = 1` in the backend.
 - **Booking status**: bookings use `status` values like `BOOKED`, `CANCELLED`.
-- **Timezone behavior**: slot filtering and past-date/past-time blocking are based on server/client current local time handling.
-- **Single host setup**: backend and frontend run locally using the default ports unless changed in `.env`.
+- **Time handling**: past dates and past-time slots are blocked based on server-side `Date` comparison (day-of-week uses `YYYY-MM-DD` in UTC to avoid shifting).
+- **Single host setup**: backend and frontend run locally using the default ports unless changed in `.env` (use `PORT` and `VITE_API_BASE_URL`, plus `FRONTEND_URL` for CORS).
 
 ### Setup
 
@@ -27,11 +27,26 @@ Create `backend/.env`:
 
 ```bash
 PORT=5000
+FRONTEND_URL=http://localhost:5173
+
+# Database (choose ONE approach)
+
+# Option A (recommended for deployments):
+DATABASE_URL=postgresql://...
+
+# Option B (local development):
 DB_USER=postgres
-DB_HOST=your-render-postgres-host
-DB_NAME=DB_Name
+DB_HOST=localhost
+DB_NAME=your_db_name
 DB_PASSWORD=your_password
 DB_PORT=5432
+
+# Email (EmailJS)
+EMAILJS_SERVICE_ID=...
+EMAILJS_PUBLIC_KEY=...
+EMAILJS_PRIVATE_KEY=...
+EMAILJS_CONFIRM_TEMPLATE_ID=...
+EMAILJS_CANCEL_TEMPLATE_ID=...
 ```
 
 Install and start:
@@ -42,13 +57,13 @@ npm install
 npm start
 ```
 
-Backend runs at your configured domain and `PORT`.
+The backend exposes APIs under `/api/*` (for example `/api/events`, `/api/availability`, `/api/bookings`, `/api/overrides`).
 
 #### 2) Frontend Setup
-Optionally create `frontend/.env`:
+Create `frontend/.env` (or update existing):
 
 ```bash
-VITE_API_BASE_URL=https://your-backend-service.onrender.com/api
+VITE_API_BASE_URL=http://localhost:5000/api
 ```
 
 Install and start:
@@ -78,12 +93,13 @@ Follow this exact order while using the app:
    - You can add multiple slots; overlapping slots are blocked.
 
 4. **Create Event Type**
-   - Go to `/` (Event types page).
+   - Go to `/` (Dashboard: Event types) and click **New event type**, or visit `/create-event`.
    - Create an event type (title, duration, slug, etc.).
    - **Choose the availability schedule** created earlier for this event type.
 
 5. **User Booking Flow**
    - Open the public booking link `/book/:slug`.
+   - (Optional) Configure date overrides at `/overrides` to block or customize availability for specific dates.
    - User selects date -> selects available slot -> enters name/email -> confirms booking.
    - Booking is created and visible in `/bookings`.
    - Past dates and past-time slots are not selectable/bookable.
@@ -93,6 +109,7 @@ Follow this exact order while using the app:
    - Cancel a booking when required (status changes to `CANCELLED`).
 
 ### URLs
-- **Admin**: `/` (Event types), `/availability`, `/bookings`
+- **Admin (Dashboard + Management)**: `/` (event types), `/create-event`, `/edit-event/:id`, `/availability`, `/overrides`, `/bookings`
 - **Public booking**: `/book/:slug`
+- **Confirmation page**: `/confirmation`
 
